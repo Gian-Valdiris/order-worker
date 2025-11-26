@@ -15,9 +15,11 @@ export default function RootLayout ({ children }: IRootProps) {
 			<head>
 				<PreloadCss />
 			</head>
+			<body>
 			<GlobalProvider>
 				{ children }
 			</GlobalProvider>
+			</body>
 		</html>
 	);
 }
