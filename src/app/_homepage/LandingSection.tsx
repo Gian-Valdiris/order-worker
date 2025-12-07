@@ -1,6 +1,5 @@
 import { useEffect, useState, MouseEvent, Dispatch, SetStateAction, useRef } from 'react';
 
-import { useRouter } from 'next/navigation';
 import { Button, useXTheme } from 'xtreme-ui';
 
 import { scrollToSection } from '#utils/helper/common';
@@ -14,7 +13,6 @@ const overlayImg = '/backgrounds/landingCoverOverlay.png';
 const maxBlurPerImage = 30;
 const maxOverlayTranslate = 0.3;
 const LandingSection = () => {
-	const router = useRouter();
 	const { isDarkTheme } = useXTheme();
 	const ref = useRef<HTMLDivElement>(null);
 	const [blurBackground, setBlurBackground] = useState<number>(maxBlurPerImage);
@@ -58,7 +56,6 @@ const LandingSection = () => {
 				<p className='desc'>paper menus. It&apos;s time for the new normal, OrderWorder</p>
 				<div className='greetingAction'>
 					<Button label='Learn more' type='secondary' onClick={() => scrollToSection('homepage-aboutus')} />
-					<Button label='Order now' onClick={() => router.push('/scan')} />
 				</div>
 			</div>
 		</section>

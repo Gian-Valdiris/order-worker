@@ -15,10 +15,12 @@ const MenuEditor = () => {
 	const [modalState, setModalState] = useState('');
 	const [editItem, setEditItem] = useState<TMenu>();
 	const [hideSettingsLoading, setHideSettingsLoading] = useState<string[]>([]);
+	const [deleteLoading, setDeleteLoading] = useState<string[]>([]);
 	const [category, setCategory] = useState(0);
 
 	const [formData, setFormData] = useState<Partial<TMenu>>({});
 	const [saving, setSaving] = useState(false);
+	const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
 
 	const categories = useRef<HTMLDivElement>(null);
 
@@ -50,10 +52,15 @@ const MenuEditor = () => {
 				category: profile?.categories?.[0] || '',
 				foodType: 'spicy',
 				veg: 'veg',
-				image: '',
+				image: [],
 			});
+			setImageErrors({});
 		} else if (modalState === 'menuItemEditState' && editItem) {
-			setFormData({ ...editItem });
+			setFormData({ 
+				...editItem,
+				image: editItem.image && Array.isArray(editItem.image) ? [...editItem.image] : []
+			});
+			setImageErrors({});
 		}
 	}, [modalState, editItem, profile, profileMutate]);
 
@@ -91,6 +98,33 @@ const MenuEditor = () => {
 		setModalState('menuItemEditState');
 	};
 
+	const onDelete = async (itemId: string) => {
+		if (!confirm('¿Estás seguro de que deseas eliminar este item del menú? Esta acción no se puede deshacer.')) {
+			return;
+		}
+
+		setDeleteLoading((v) => ([...v, itemId]));
+		try {
+			const req = await fetch('/api/admin/menu', {
+				method: 'DELETE',
+				body: JSON.stringify({ _id: itemId }),
+			});
+			const res = await req.json();
+
+			if (res?.status === 200) {
+				toast.success(res.message || 'Item eliminado correctamente');
+				await profileMutate();
+			} else {
+				toast.error(res?.message || 'Error al eliminar el item');
+			}
+		} catch (error) {
+			console.error(error);
+			toast.error('Error al eliminar el item');
+		} finally {
+			setDeleteLoading((v) => v.filter((item) => item !== itemId));
+		}
+	};
+
 	const saveItem = async () => {
 		if (!formData.name || !formData.price || !formData.category) {
 			return toast.warn('Name, Price and Category are required');
@@ -109,6 +143,7 @@ const MenuEditor = () => {
 			if (res.status === 200) {
 				toast.success(res.message);
 				setModalState('');
+				setImageErrors({});
 				profileMutate();
 			} else {
 				toast.error(res.message);
@@ -170,7 +205,9 @@ const MenuEditor = () => {
 								item={item}
 								onEdit={onEdit}
 								onHide={onHide}
+								onDelete={onDelete}
 								hideSettingsLoading={hideSettingsLoading.includes(item._id.toString())}
+								deleteLoading={deleteLoading.includes(item._id.toString())}
 							/>
 						))
 					)}
@@ -190,19 +227,109 @@ const MenuEditor = () => {
 							<Icon code='e43b' type='solid' size={24} />
 							<h2>{modalState === 'newState' ? 'Add New Menu Item' : 'Edit Menu Item'}</h2>
 						</div>
-						<button className='closeBtn' onClick={() => setModalState('')}>
-							<Icon code='f00d' type='solid' size={16} />
+						<button className='closeBtn' onClick={() => setModalState('')} title='Cerrar'>
+							<i className='fa-solid fa-x'></i>
 						</button>
 					</div>
 					<div className='form'>
+						<div className='formSection imageSection'>
+							<h3>
+								<Icon code='f03e' type='solid' size={18} />
+								<span>Images</span>
+							</h3>
+							<div className='imagesContainer'>
+								{formData.image && formData.image.length > 0 && formData.image.map((url, index) => (
+									<div key={index} className='imageItem'>
+										<div className='imagePreviewWrapper'>
+											{url && url.trim() ? (
+												<>
+													<img 
+														src={url} 
+														alt={`Preview ${index + 1}`} 
+														onError={() => setImageErrors({ ...imageErrors, [index]: true })}
+														onLoad={() => setImageErrors({ ...imageErrors, [index]: false })}
+														style={{ display: imageErrors[index] ? 'none' : 'block' }}
+													/>
+													{imageErrors[index] && (
+														<div className='imageError'>
+															<Icon code='f06a' type='solid' size={24} />
+															<span>Invalid URL</span>
+														</div>
+													)}
+												</>
+											) : (
+												<div className='imageError'>
+													<Icon code='f03e' type='solid' size={24} />
+													<span>Enter image URL</span>
+												</div>
+											)}
+											<button
+												className='removeImageBtn'
+												onClick={() => {
+													const newImages = formData.image?.filter((_, i) => i !== index) || [];
+													const newErrors = { ...imageErrors };
+													delete newErrors[index];
+													// Reindex errors
+													const reindexedErrors: Record<number, boolean> = {};
+													Object.keys(newErrors).forEach(key => {
+														const oldIndex = Number(key);
+														if (oldIndex > index) {
+															reindexedErrors[oldIndex - 1] = newErrors[oldIndex];
+														} else {
+															reindexedErrors[oldIndex] = newErrors[oldIndex];
+														}
+													});
+													setImageErrors(reindexedErrors);
+													setFormData({ ...formData, image: newImages });
+												}}
+												title='Remove image'
+											>
+												<Icon code='f00d' type='solid' size={14} />
+											</button>
+										</div>
+										<Textfield
+											value={url}
+											onChange={(e) => {
+												const newImages = [...(formData.image || [])];
+												newImages[index] = e.target.value;
+												setFormData({ ...formData, image: newImages });
+												// Reset error when URL changes
+												if (imageErrors[index]) {
+													setImageErrors({ ...imageErrors, [index]: false });
+												}
+											}}
+											placeholder={`Image ${index + 1} URL`}
+										/>
+									</div>
+								))}
+								{(!formData.image || formData.image.length === 0) && (
+									<div className='emptyImagesState'>
+										<Icon code='f03e' type='solid' size={48} />
+										<p>No images added yet</p>
+										<p className='hint'>Add image URLs to showcase your menu item</p>
+									</div>
+								)}
+								<Button
+									label='+ Add Image'
+									onClick={() => {
+										const newImages = [...(formData.image || []), ''];
+										setFormData({ ...formData, image: newImages });
+									}}
+									type='secondary'
+									size='mini'
+									icon='f067'
+									iconType='solid'
+								/>
+							</div>
+						</div>
+
 						<div className='formSection'>
 							<h3>Basic Information</h3>
 							<div className='inputGroup'>
 								<label>
-									<Icon code='f02b' type='solid' size={14} />
 									<span>Item Name *</span>
 								</label>
-								<Textfield
+								<input
 									value={formData.name || ''}
 									onChange={(e) => setFormData({ ...formData, name: e.target.value })}
 									placeholder='e.g. Margherita Pizza'
@@ -210,7 +337,6 @@ const MenuEditor = () => {
 							</div>
 							<div className='inputGroup'>
 								<label>
-									<Icon code='f15c' type='solid' size={14} />
 									<span>Description</span>
 								</label>
 								<textarea
@@ -232,15 +358,14 @@ const MenuEditor = () => {
 									</label>
 									<div className='priceInput'>
 										<span className='currency'>$</span>
-										<Textfield
+										<input
 											type='number'
 											value={String(formData.price || '')}
 											onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
 											placeholder='0.00'
 										/>
 									</div>
-								</div>
-								<div className='inputGroup'>
+															<div className='inputGroup'>
 									<label>
 										<Icon code='f07b' type='solid' size={14} />
 										<span>Category *</span>
@@ -289,10 +414,11 @@ const MenuEditor = () => {
 										<Icon code='f078' type='solid' size={12} />
 									</div>
 								</div>
+								</div>
 							</div>
 						</div>
 
-						<div className='formSection'>
+						<div className='formSection' style={{ display: 'none' }}>
 							<h3>Properties</h3>
 							<div className='row'>
 								<div className='inputGroup'>
@@ -329,26 +455,6 @@ const MenuEditor = () => {
 										<Icon code='f078' type='solid' size={12} />
 									</div>
 								</div>
-							</div>
-						</div>
-
-						<div className='formSection'>
-							<h3>Media</h3>
-							<div className='inputGroup'>
-								<label>
-									<Icon code='f03e' type='solid' size={14} />
-									<span>Image URL</span>
-								</label>
-								<Textfield
-									value={formData.image || ''}
-									onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-									placeholder='https://example.com/image.jpg'
-								/>
-								{formData.image && (
-									<div className='imagePreview'>
-										<img src={formData.image} alt='Preview' onError={(e) => e.currentTarget.style.display = 'none'} />
-									</div>
-								)}
 							</div>
 						</div>
 

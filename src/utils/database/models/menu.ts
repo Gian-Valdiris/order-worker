@@ -17,13 +17,27 @@ const MenuSchema = new mongoose.Schema<TMenu>({
 	taxPercent: { type: Number, trim: true, required: true },
 	foodType: { type: String, trim: true, lowercase: true, enum: FoodType },
 	veg: { type: String, trim: true, lowercase: true, required: true, enum: Veg },
-	image: { type: String, trim: true },
+	image: { type: [String], trim: true, default: [] },
 	hidden: { type: Boolean, default: true },
 },
 { timestamps: true });
 
 MenuSchema.pre('save', async function (next) {
 	try {
+		// Normalizar el campo image para que siempre sea un array
+		if (this.image) {
+			if (typeof this.image === 'string') {
+				this.image = [this.image];
+			} else if (Array.isArray(this.image)) {
+				// Filtrar valores vacíos y null
+				this.image = this.image.filter(img => img && typeof img === 'string' && img.trim().length > 0);
+			} else {
+				this.image = [];
+			}
+		} else {
+			this.image = [];
+		}
+
 		let account = accountCache.get(this.restaurantID);
 		if (!account) {
 			account = await Accounts.findOne<TAccount>({ username: this.restaurantID }).populate('profile')
@@ -55,7 +69,7 @@ export type TMenu = HydratedDocument<{
 	taxPercent: number;
 	foodType: TFoodType;
 	veg: TVeg;
-	image: string;
+	image: string[];
 	hidden: boolean;
 }>
 

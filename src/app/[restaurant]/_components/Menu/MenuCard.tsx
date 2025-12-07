@@ -4,6 +4,7 @@ import { Icon } from 'xtreme-ui';
 
 import QuantityButton from '#components/base/QuantityButton';
 import { TMenu } from '#utils/database/models/menu';
+import { formatCOP } from '#utils/helper/formatHelper';
 
 import './menuCard.scss';
 
@@ -14,7 +15,7 @@ const vegIcon = {
 } as const;
 
 const MenuCard = (props: TMenuCardProps) => {
-	const { className, show, restrictOrder, showInfo, setShowInfo, item, quantity } = props;
+	const { className, show, restrictOrder, showInfo, setShowInfo, item, quantity, onItemClick } = props;
 	const [cardRef, inView] = useInView({ threshold: 0 });
 
 	const classList = clsx(
@@ -33,33 +34,26 @@ const MenuCard = (props: TMenuCardProps) => {
 			{
 				inView
 				&& <>
-					{
-						item.image &&
-						<div className='picture'>
-							<span style={{ background: `url(${item.image})` }} />
-							<div className='description'>{item.description}</div>
-						</div>
-					}
-					{
-						item.veg &&
-						<div className={`vegIcon ${item.veg}`}>
-							<Icon className='icon' type='duotone' size={16} code={vegIcon[item.veg]} />
-							<span className='label'>{item.veg.replace(/-/g, ' ')}</span>
-						</div>
-					}
+				{
+					item.image?.[0] &&
+					<div className='picture' onClick={() => onItemClick?.(item)} style={{ cursor: onItemClick ? 'pointer' : 'default' }}>
+						<span style={{ background: `url(${item.image[0]})` }} />
+						<div className='description'>{item.description}</div>
+					</div>
+				}
 					<div className='options'>
 						<div className='title'>
 							<span>{item.name}</span>
 							{
-								item.image &&
+								item.image?.[0] &&
 								<div className='info' onClick={() => setShowInfo(showInfo ? false : !!item._id)}>
 									<Icon code={showInfo ? 'f00d' : 'f05a'} />
 								</div>
 							}
 						</div>
-						{ !item.image && <div className='description'>{item.description}</div> }
+						{ !item.image?.[0] && <div className='description'>{item.description}</div> }
 						<div className='footer'>
-							{!item.image && <div className='priceNoImage rupee'>{item.price}</div>}
+							{!item.image?.[0] && <div className='priceNoImage rupee'>{formatCOP(item.price)}</div>}
 							<QuantityButton className='addToCart' quantity={quantity} filled
 								increaseQuantity={() => props.increaseQuantity(item)}
 								decreaseQuantity={() => props.decreaseQuantity(item)}
@@ -67,11 +61,11 @@ const MenuCard = (props: TMenuCardProps) => {
 						</div>
 					</div>
 					{
-						item.image &&
+						item.image?.[0] &&
 						<div className='price rupee'>
 							<div className='ribbonTop' />
 							<div className='ribbonBottom' />
-							<span>{item.price}</span>
+							<span>{formatCOP(item.price)}</span>
 						</div>
 					}
 				</>
@@ -92,6 +86,7 @@ type TMenuCardProps = {
 	quantity: number,
 	increaseQuantity: (item: TMenuCustom) => void,
 	decreaseQuantity: (item: TMenuCustom) => void,
+	onItemClick?: (item: TMenuCustom) => void,
 }
 
 type TMenuCustom = TMenu & {quantity: number}

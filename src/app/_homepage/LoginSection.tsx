@@ -26,9 +26,6 @@ const LoginSection = () => {
 	const [email, setEmail] = useState('');
 	const [emailShake, setEmailShake] = useState(false);
 
-	const [kitchenUsername, setKitchenUsername] = useState('');
-	const [showKitchen, setShowKitchen] = useState(false);
-
 	const [password, setPassword] = useState('');
 	const [passwordShake, setPasswordShake] = useState(false);
 
@@ -51,7 +48,6 @@ const LoginSection = () => {
 			const res = await signIn('restaurant', {
 				redirect: false,
 				username: email,
-				...(showKitchen && { kitchen: kitchenUsername }),
 				password,
 				callbackUrl: `${window.location.origin}`,
 			});
@@ -64,8 +60,7 @@ const LoginSection = () => {
 				return setNextLoading(false);
 			}
 
-			if (kitchenUsername) router.push('/kitchen');
-			else router.push('/dashboard');
+			router.push('/dashboard');
 		}
 		setNextLoading(false);
 	};
@@ -109,7 +104,7 @@ const LoginSection = () => {
 				<div className='loginCard back'>
 					<div className='header'>
 						{
-							((session.data?.role === 'admin' || session.data?.role === 'kitchen') && profileLoading)
+							(session.data?.role === 'admin' && profileLoading)
 								? <div className='details'><p className='name'> OrderWorder</p></div>
 								: <>
 									<Avatar src={profile?.avatar ?? dashboard?.avatar ?? session.data?.restaurant?.avatar ?? ''} size='mini' />
@@ -135,29 +130,15 @@ const LoginSection = () => {
 							? <div className='body'>
 								<div className='inputContainer'>
 									<Textfield
-										className={`username ${showKitchen ? 'show' : ''}`}
-										icon='f86b'
-										placeholder='Enter kitchen username'
-										value={kitchenUsername}
-										onChange={(e) => setKitchenUsername(e.target.value)}
-									/>
-									<Textfield
 										type='password'
 										className={`password ${passwordShake ? 'shake' : ''}`}
-										placeholder={`Enter ${showKitchen ? 'kitchen' : 'admin'} password`}
+										placeholder='Enter admin password'
 										onEnterKey={onNext}
 										value={password}
 										onChange={(e) => setPassword(e.target.value)}
 									/>
 								</div>
 								<div className='loginAction'>
-									<Button
-										className={`kitchenMode ${showKitchen ? 'active' : ''}`}
-										type={showKitchen ? 'primary' : 'secondary'}
-										label='login to kitchen'
-										size='mini'
-										onClick={() => setShowKitchen((v) => !v)}
-									/>
 									<Button className='next' label='Sign In' onClick={onNext} loading={nextLoading} />
 								</div>
 							</div>
@@ -171,15 +152,7 @@ const LoginSection = () => {
 										onClick={() => router.push('/dashboard')}
 									/>
 								}
-								{
-									(session.data?.role === 'admin' || session.data?.role === 'kitchen') &&
-									<Button
-										label='open kitchen'
-										icon='f86b'
-										size='mini'
-										onClick={() => router.push('/kitchen')}
-									/>
-								}
+
 								{
 									session.data?.role === 'customer' &&
 									<Button

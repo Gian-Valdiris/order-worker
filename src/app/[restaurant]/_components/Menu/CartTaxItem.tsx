@@ -1,5 +1,7 @@
 import clsx from 'clsx';
 
+import { formatCOP } from '#utils/helper/formatHelper';
+
 import './cartTaxItem.scss';
 
 const CartTaxItem = (props: TCartTaxItemProps) => {
@@ -9,7 +11,7 @@ const CartTaxItem = (props: TCartTaxItemProps) => {
 		<div className={clsx('cartTaxItem', className, size)} onClick={onClick}>
 			<p className='taxName'>{name + (taxPercent ? ` (${taxPercent}%)` : '')}</p>
 			{subtitle && <p className='subtitle'>{subtitle}</p>}
-			<p className='taxAmount rupee'>{roundAmount}</p>
+			<p className='taxAmount rupee'>{formatCOP(roundAmount)}</p>
 		</div>
 	);
 };

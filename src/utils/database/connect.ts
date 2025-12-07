@@ -2,7 +2,6 @@ import { connect } from 'mongoose';
 import './models/profile';
 import './models/account';
 import './models/customer';
-import './models/kitchen';
 import './models/menu';
 import './models/table';
 import './models/order';

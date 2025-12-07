@@ -23,7 +23,7 @@
 		width: max-content;
 		min-width: 60px;
 		max-width: 260px;
-		font-size: 12px;
+		font-size: 13px;
 		font-variation-settings: 'wdth' 75, 'wght' 500;
 		text-align: center;
 		display: -webkit-box;
@@ -32,18 +32,32 @@
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 		text-transform: capitalize;
-		margin: 0 30px;
+		margin: 0 20px;
 		color: var(--colorContentPrimary);
 	}
 }
 
 @media (width <= 750px) {
 	.menuCategory {
-		height: 50px;
-    	max-height: 50px;
+		height: 45px;
+    	max-height: 45px;
 
-		span {
-			margin: 0 1.5rem !important;
+		> .title {
+			font-size: 12px;
+			margin: 0 15px !important;
+		}
+	}
+}
+
+@media (width <= 530px) {
+	.menuCategory {
+		height: 42px;
+    	max-height: 42px;
+
+		> .title {
+			font-size: 11px;
+			margin: 0 12px !important;
+			font-weight: 500;
 		}
 	}
 }

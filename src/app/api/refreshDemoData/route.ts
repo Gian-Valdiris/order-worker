@@ -1,6 +1,5 @@
 import connectDB from '#utils/database/connect';
 import { Accounts } from '#utils/database/models/account';
-import { Kitchens } from '#utils/database/models/kitchen';
 import { Menus } from '#utils/database/models/menu';
 import { Profiles } from '#utils/database/models/profile';
 import { Tables } from '#utils/database/models/table';
@@ -13,7 +12,6 @@ const deleteData = async (ids: string[]) => {
 	const start = performance.now();
 	const models = [
 		{ model: Menus, name: 'Menus' },
-		{ model: Kitchens, name: 'Kitchens' },
 		{ model: Profiles, name: 'Profiles' },
 		{ model: Tables, name: 'Tables' },
 		{ model: Accounts, name: 'Accounts', field: 'username' },
@@ -33,13 +31,12 @@ const deleteData = async (ids: string[]) => {
 };
 
 const createData = async (props: TDocumentData) => {
-	const { account, profile, menus, kitchens, tables } = props;
+	const { account, profile, menus, tables } = props;
 	const start = performance.now();
 	const newAccount = await new Accounts(account).save();
 	const newProfile = await new Profiles(profile).save();
-	const [newMenus, newKitchen, newTables] = await Promise.all([
+	const [newMenus, newTables] = await Promise.all([
 		Promise.all(menus.map((m) => new Menus(m).save())),
-		Promise.all(kitchens.map((k) => new Kitchens(k).save())),
 		Promise.all(tables.map((t) => new Tables(t).save())),
 	]);
 
@@ -48,7 +45,6 @@ const createData = async (props: TDocumentData) => {
 		account: newAccount,
 		profile: newProfile,
 		menus: newMenus,
-		kitchens: newKitchen,
 		tables: newTables,
 	};
 };
@@ -82,6 +78,5 @@ type TDocumentData = {
 	account: unknown,
 	profile: unknown,
 	menus: Array<unknown>,
-	kitchens: Array<unknown>,
 	tables: Array<unknown>
 }

@@ -3,6 +3,7 @@ import { useInView } from 'react-intersection-observer';
 
 import QuantityButton from '#components/base/QuantityButton';
 import { TMenu } from '#utils/database/models/menu';
+import { formatCOP } from '#utils/helper/formatHelper';
 
 import './itemCard.scss';
 
@@ -25,25 +26,25 @@ const ItemCard = (props: TItemCardProps) => {
 				inView
 				&& <>
 					{
-						item.image
+						item.image?.[0]
 						&& <div className='picture'>
-							<span style={{ background: `url(${item.image})` }} />
+							<span style={{ background: `url(${item.image[0]})` }} />
 						</div>
 					}
 					<div className='options'>
 						<p className='title'>{item.name}</p>
 						<div className='footer'>
 							<div className='price'>
-								{!staticCard && <p className='rupee'>{ getTotalPrice() }</p>}
+								{!staticCard && <p className='rupee'>{ formatCOP(getTotalPrice()) }</p>}
 								{
 									staticCard && <p className='rupee'>
-										{ item.price } <span>✕</span> {item.quantity}
+										{ formatCOP(item.price) } <span>✕</span> {item.quantity}
 									</p>
 								}
 							</div>
 							{
 								staticCard
-									? <div className='totalAmount rupee'>{ getTotalPrice() }</div>
+									? <div className='totalAmount rupee'>{ formatCOP(getTotalPrice()) }</div>
 									: (
 										<QuantityButton className='addToCart'
 											quantity={item.quantity}

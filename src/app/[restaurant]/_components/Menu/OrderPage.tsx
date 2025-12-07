@@ -12,6 +12,7 @@ import { useQueryParams } from '#utils/hooks/useQueryParams';
 
 import CartPage from './CartPage';
 import MenuCard from './MenuCard';
+import ProductDetailModal from './ProductDetailModal';
 import UserLogin from './UserLogin';
 import './orderPage.scss';
 
@@ -41,6 +42,8 @@ const OrderPage = () => {
 	const [leftCategoryScroll, setLeftCategoryScroll] = useState(false);
 	const [rightCategoryScroll, setRightCategoryScroll] = useState(true);
 	const [showInfoCard, setShowInfoCard] = useState(false);
+	const [selectedProductDetail, setSelectedProductDetail] = useState<TMenuCustom | null>(null);
+	const [productDetailModalOpen, setProductDetailModalOpen] = useState(false);
 
 	const [filteredProducts, setFilteredProducts] = useState<Array<TMenuCustom>>(menus);
 	const [selectedProducts, setSelectedProducts] = useState<Array<TMenuCustom>>([]);
@@ -84,7 +87,7 @@ const OrderPage = () => {
 	};
 	const onLoginClick = () => {
 		if (table) return setLoginOpen(true);
-		return params.router.push('/scan');
+		return params.router.push('/');
 	};
 	const increaseProductQuantity = (product: TMenuCustom) => {
 		const selection = [...selectedProducts];
@@ -163,11 +166,7 @@ const OrderPage = () => {
 							setValue={setSearchValue}
 						/>
 						{
-							(!session.data?.role || !showOrderButton) &&
-							<Button className='loginButton' label={showOrderButton ? 'Order' : 'Scan'} onClick={onLoginClick} />
-						}
-						{
-							eligibleToOrder &&
+							selectedProducts.length > 0 &&
 							<Button
 								icon='e43b'
 								label={(selectedProducts?.length > 0 ? selectedProducts?.length : '') + ''}
@@ -182,16 +181,6 @@ const OrderPage = () => {
 								icon='e09f'
 								iconType='solid'
 								onClick={() => params.router.push('/dashboard')}
-							/>
-						}
-						{
-							session.data?.role === 'kitchen' &&
-							<Button
-								className='kitchenButton'
-								label='Kitchen'
-								icon='e09f'
-								iconType='solid'
-								onClick={() => params.router.push('/kitchen')}
 							/>
 						}
 					</div>
@@ -211,12 +200,8 @@ const OrderPage = () => {
 									</ActionCard>
 								))
 							}
-							<div className='space' />
 							<div className={`scrollLeft ${leftCategoryScroll ? 'show' : ''}`} onClick={categoryScrollLeft}>
 								<Icon code='f053' />
-							</div>
-							<div className={`scrollRight ${rightCategoryScroll ? 'show' : ''}`} onClick={categoryScrollRight}>
-								<Icon code='f054' />
 							</div>
 						</div>
 					</div>
@@ -245,6 +230,10 @@ const OrderPage = () => {
 														selectedProducts.some((obj) => obj._id === item._id) &&
 														selectedProducts?.find((obj) => obj._id === item._id)?.quantity) || 0
 													}
+													onItemClick={(item) => {
+														setSelectedProductDetail(item);
+														setProductDetailModalOpen(true);
+													}}
 												/>
 											))
 										}
@@ -292,6 +281,18 @@ const OrderPage = () => {
 			<Modal open={loginOpen} setOpen={setLoginOpen}>
 				<UserLogin setOpen={setLoginOpen} />
 			</Modal>
+			<ProductDetailModal 
+				open={productDetailModalOpen} 
+				setOpen={setProductDetailModalOpen}
+				item={selectedProductDetail}
+				quantity={selectedProductDetail ? (selectedProducts.find(p => p._id === selectedProductDetail._id)?.quantity || 0) : 0}
+				increaseQuantity={increaseProductQuantity}
+				decreaseQuantity={decreaseProductQuantity}
+				onAddToOrder={() => {
+					// Abrir el carrito automáticamente después de añadir
+					setSideSheetOpen(true);
+				}}
+			/>
 		</div>
 	);
 };

@@ -59,14 +59,6 @@ const profile = {
 	],
 };
 
-const kitchens = [
-	{
-		restaurantID: 'empire',
-		username: 'empireKitchen1',
-		password: '123456',
-	},
-];
-
 const tables = Array.from({ length: 5 }, (_, i) => ({
 	restaurantID: 'empire',
 	name: 'Table ' + i,
@@ -74,7 +66,7 @@ const tables = Array.from({ length: 5 }, (_, i) => ({
 }));
 
 const empire = {
-	account, profile, menus, kitchens, tables,
+	account, profile, menus, tables,
 };
 
 export default empire;

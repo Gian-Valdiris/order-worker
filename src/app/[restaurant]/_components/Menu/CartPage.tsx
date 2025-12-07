@@ -10,6 +10,7 @@ import Collapsible from '#components/layout/Collapsible';
 import NoContent from '#components/layout/NoContent';
 import { getAnimSrc } from '#utils/constants/common';
 import { TMenu } from '#utils/database/models/menu.js';
+import { formatCOP } from '#utils/helper/formatHelper';
 
 import ItemCard from '../../../../components/layout/ItemCard';
 
@@ -148,8 +149,8 @@ const CartPage = (props: TCartPageProps) => {
 									? <h5>Bill <span>Summary</span></h5>
 									: <>
 										<p>Sub Total</p>
-										<span className='totalValue rupee'>{order?.orderTotal} </span>
-										{ order?.orderTotal && <span className='plusTaxes'> + ₹{order?.taxTotal} Tax</span> }
+										<span className='totalValue rupee'>{formatCOP(order?.orderTotal ?? 0)} </span>
+										{ order?.orderTotal && <span className='plusTaxes'> + ${formatCOP(order?.taxTotal ?? 0)} Tax</span> }
 									</>
 							}
 						</div>
@@ -163,7 +164,7 @@ const CartPage = (props: TCartPageProps) => {
 								bottomBarActive ? 'close'
 									: (
 										props.selectedProducts.length > 0 ?
-											`${selectionTotal} | ${order?.products?.length ? 'Add to order' : 'Place order'}`
+											`$${formatCOP(selectionTotal)} | ${order?.products?.length ? 'Add to order' : 'Place order'}`
 											: 'Proceed to Pay'
 									)
 							}

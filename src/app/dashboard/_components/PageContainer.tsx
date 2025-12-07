@@ -25,8 +25,6 @@ export default function PageContainer () {
 	useEffect(() => {
 		if (session.status === 'unauthenticated')
 			queryParams.router.replace('/');
-		if (session?.data?.role === 'kitchen')
-			queryParams.router.replace('/kitchen');
 	}, [queryParams.router, session]);
 
 	return (

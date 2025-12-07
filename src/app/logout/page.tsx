@@ -26,7 +26,7 @@ export default function Logout () {
 				const { role, restaurant, table } = JSON.parse(localStorage.getItem('logoutData') ?? '');
 				localStorage.removeItem('logoutData');
 
-				if (role === 'admin' || role === 'kitchen') router.push('/');
+				if (role === 'admin') router.push('/');
 				else if (role === 'customer') router.push(`/${restaurant}?table=${table}`);
 				else router.push('/');
 			}

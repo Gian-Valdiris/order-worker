@@ -28,10 +28,26 @@ export async function GET (req: Request) {
 			.lean();
 		if (!account) throw { status: 404, message: `Account with restaurant id: ${username} is not found` };
 
+		// Normalizar los menus para asegurar que image siempre sea un array
+		const normalizedMenus = account?.menus?.map((v: TMenu) => {
+			const menu = omit(v, ['__v']);
+			// Normalizar el campo image
+			if (menu.image) {
+				if (typeof menu.image === 'string') {
+					menu.image = [menu.image];
+				} else if (!Array.isArray(menu.image)) {
+					menu.image = [];
+				}
+			} else {
+				menu.image = [];
+			}
+			return menu;
+		}) || [];
+
 		return NextResponse.json({
 			...omit(account, ['__v', '_id', 'kitchens', 'password', 'profile', 'menus', 'tables']),
 			profile: omit(account?.profile, ['__v', '_id']),
-			menus: account?.menus.map((v: TMenu) => omit(v, ['__v'])),
+			menus: normalizedMenus,
 			tables: account?.tables.map((v: TTable) => omit(v, ['__v', '_id'])),
 		});
 	}

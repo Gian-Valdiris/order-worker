@@ -13,6 +13,7 @@ export default function RootLayout ({ children }: IRootProps) {
 	return (
 		<html lang='en' className={montserrat.variable} suppressHydrationWarning>
 			<head>
+				<script src='https://kit.fontawesome.com/9af3102438.js' crossOrigin='anonymous' async></script>
 				<PreloadCss />
 			</head>
 			<body>
