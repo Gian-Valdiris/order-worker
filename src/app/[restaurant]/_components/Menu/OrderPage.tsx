@@ -289,7 +289,6 @@ const OrderPage = () => {
 				increaseQuantity={increaseProductQuantity}
 				decreaseQuantity={decreaseProductQuantity}
 				onAddToOrder={() => {
-					// Abrir el carrito automáticamente después de añadir
 					setSideSheetOpen(true);
 				}}
 			/>
