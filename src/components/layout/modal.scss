@@ -40,8 +40,8 @@
 		top: 63px; right: 51px;
 		opacity: 0;
 		display: flex;
-		width: 500px;
-		padding: 36px;
+		width: 400px;
+		padding: 10px 0px !important;
 		transform: scale(0) translate(50%, -50%);
 		transform-origin: top right;
 		border-radius: 25px;
@@ -49,7 +49,8 @@
 		box-shadow: 0 0 100px rgb(0 0 0 / 30%);
 		background-color: var(--colorBackgroundPrimary);
 		transition: all var(--modalDuration) ease-out, top var(--modalDuration) ease-in;
-
+		display: flex;
+		justify-content: center;
 		.closeModal {
 			position: absolute;
 			top: 24px; right: 24px;

@@ -174,8 +174,7 @@ const ProductDetailModal = (props: TProductDetailModalProps) => {
 							<Button
 								className='addToOrderButton'
 								type='primary'
-								size='large'
-								label={localQuantity > 0 ? `Añadir ${localQuantity} al pedido` : 'Añadir al pedido'}
+								label={localQuantity > 0 ? `Añadir ${localQuantity} unidades` : 'Añadir'}
 								icon='e1bc'
 								iconType='solid'
 								disabled={localQuantity === 0}

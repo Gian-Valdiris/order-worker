@@ -27,6 +27,11 @@
 
 		> i {
 			color: inherit;
+			font-size: 12px;
+			line-height: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 		}
 
 		&:active {
@@ -35,6 +40,10 @@
 
 			> span {
 				background-color: var(--colorBackgroundPrimary);
+			}
+
+			> i {
+				color: var(--colorBackgroundPrimary);
 			}
 		}
 
@@ -45,6 +54,16 @@
 			height: 100%;
 			text-transform: uppercase;
 			transition: width 0.1s ease-out, font-size 0s;
+
+			> i {
+				font-size: 14px;
+			}
+		}
+
+		&.decrease {
+			> i {
+				font-size: 12px;
+			}
 		}
 	}
 
@@ -68,11 +87,18 @@
 			padding: 0 12px;
 			border: 1px solid transparent;
 			margin: 0 var(--quantityButtonHeight) 0 0;
+			gap: 6px;
 
 			p {
 				margin: 0;
 				font-size: 14px;
 				font-variation-settings: 'wdth' 75, 'wght' 600;
+			}
+
+			i {
+				font-size: 12px;
+				color: var(--colorContentPrimary);
+				opacity: 0.7;
 			}
 
 			span {

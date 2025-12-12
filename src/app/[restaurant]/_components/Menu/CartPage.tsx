@@ -164,7 +164,7 @@ const CartPage = (props: TCartPageProps) => {
 								bottomBarActive ? 'close'
 									: (
 										props.selectedProducts.length > 0 ?
-											`$${formatCOP(selectionTotal)} | ${order?.products?.length ? 'Add to order' : 'Place order'}`
+											`$${formatCOP(selectionTotal)} | ${order?.products?.length ? 'Add to order' : 'HACER PEDIDO'}`
 											: 'Proceed to Pay'
 									)
 							}
